@@ -75,17 +75,17 @@ export type ApiResponse<T = any> = {
 
 // 导出请求方法
 export const api = {
-  get: <T = any>(url: string, config = {}) => 
-    request.get<any, ApiResponse<T>>(url, config),
+  get: (url: string, config = {}): any => 
+    request.get(url, config),
     
-  post: <T = any>(url: string, data = {}, config = {}) => 
-    request.post<any, ApiResponse<T>>(url, data, config),
+  post: (url: string, data = {}, config = {}): any => 
+    request.post(url, data, config),
     
-  put: <T = any>(url: string, data = {}, config = {}) => 
-    request.put<any, ApiResponse<T>>(url, data, config),
+  put: (url: string, data = {}, config = {}): any => 
+    request.put(url, data, config),
     
-  delete: <T = any>(url: string, config = {}) => 
-    request.delete<any, ApiResponse<T>>(url, config),
+  delete: (url: string, config = {}): any => 
+    request.delete(url, config),
 };
 
 export default request; 

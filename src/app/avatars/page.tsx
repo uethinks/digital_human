@@ -26,32 +26,43 @@ export default function AvatarList() {
     }
 
     return (
-        <div className="min-h-screen bg-gray-50">
+        <div className="min-h-screen bg-[var(--background)]">
             <div className="container mx-auto px-4 py-12">
                 <div className="flex justify-between items-center mb-8">
                     <h1 className="text-3xl font-bold text-gray-900">我的数字人</h1>
-                    <button
-                        onClick={() => router.push('/avatars/create')}
-                        className="bg-blue-500 hover:bg-blue-600 text-white px-6 py-2 rounded-full 
-                        transition-all duration-200 ease-in-out transform hover:scale-105 
-                        shadow-md hover:shadow-lg"
-                    >
-                        创建数字人
-                    </button>
+                    <div className="flex gap-4">
+                        <button
+                            onClick={() => router.push('/videos')}
+                            className="bg-white hover:bg-gray-50 text-gray-700 px-6 py-2 rounded-full 
+                            transition-all duration-200 ease-in-out transform hover:scale-105 
+                            shadow-md hover:shadow-lg border border-gray-200"
+                        >
+                            我的视频
+                        </button>
+                        <button
+                            onClick={() => router.push('/avatars/create')}
+                            className="bg-blue-500 hover:bg-blue-600 text-white px-6 py-2 rounded-full 
+                            transition-all duration-200 ease-in-out transform hover:scale-105 
+                            shadow-md hover:shadow-lg"
+                        >
+                            创建数字人
+                        </button>
+                    </div>
                 </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
                     {talkingPhotos.map((avatar) => (
                         <div 
-                            key={avatar.talking_photo_id} 
-                            className="bg-white rounded-xl shadow-sm hover:shadow-md transition-shadow duration-200 overflow-hidden"
+                            key={avatar.talking_photo_id}
+                            onClick={() => router.push(`/avatars/${avatar.talking_photo_id}`)}
+                            className="group bg-white rounded-xl shadow-sm hover:shadow-md transition-all duration-200 overflow-hidden cursor-pointer transform hover:scale-[1.02]"
                         >
                             {/* 图片容器 */}
                             <div className="relative aspect-[4/3] overflow-hidden">
                                 <img 
                                     src={avatar.preview_image_url} 
                                     alt={avatar.talking_photo_name}
-                                    className="w-full h-full object-cover transform hover:scale-105 transition-transform duration-300"
+                                    className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
                                 />
                             </div>
                             
@@ -61,19 +72,13 @@ export default function AvatarList() {
                                     {avatar.talking_photo_name}
                                 </h2>
                                 
-                                <button
-                                    onClick={() => {
-                                        router.push(`/avatars/${avatar.talking_photo_id}`);
-                                    }}
-                                    className="w-full bg-gradient-to-r from-blue-500 to-blue-600 
-                                    hover:from-blue-600 hover:to-blue-700 text-white font-medium
-                                    py-3 px-6 rounded-lg transition-all duration-200 
-                                    transform hover:scale-[1.02] hover:shadow-lg
-                                    flex items-center justify-center space-x-2"
+                                <div className="w-full bg-gradient-to-r from-blue-500 to-blue-600 
+                                    text-white font-medium py-3 px-6 rounded-lg transition-all duration-200 
+                                    flex items-center justify-center space-x-2 group-hover:from-blue-600 group-hover:to-blue-700"
                                 >
                                     <span>生成视频</span>
                                     <svg 
-                                        className="w-5 h-5" 
+                                        className="w-5 h-5 transform transition-transform duration-200 group-hover:translate-x-1" 
                                         fill="none" 
                                         stroke="currentColor" 
                                         viewBox="0 0 24 24"
@@ -85,7 +90,7 @@ export default function AvatarList() {
                                             d="M9 5l7 7-7 7"
                                         />
                                     </svg>
-                                </button>
+                                </div>
                             </div>
                         </div>
                     ))}

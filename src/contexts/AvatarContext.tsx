@@ -1,8 +1,7 @@
 'use client';
 
 import { createContext, useContext, useState, useEffect, ReactNode } from 'react';
-import type { Avatar, TalkingPhoto } from '@/app/api/avatars/route';
-import { GET, LIST_TALKING_PHOTOS } from '@/app/api/avatars/route';
+import { Avatar, avatarApi, TalkingPhoto } from '@/services/api';
 
 interface AvatarContextType {
   avatars: Avatar[];
@@ -26,9 +25,7 @@ export function AvatarProvider({ children }: { children: ReactNode }) {
   const refreshAvatars = async () => {
     try {
       setLoading(true);
-      const response = await GET();
-    //   const res = await LIST_TALKING_PHOTOS();
-    //   console.log('talking photos', res);
+      const response = await avatarApi.list();
       if (!response.data) {
         throw new Error("No data received");
       }

@@ -16,7 +16,7 @@ export default function Home() {
         </a>
         
         <a href="/videos" className="p-6 border rounded-lg hover:shadow-lg transition-shadow">
-          <h2 className="text-xl font-semibold mb-4">视频生成</h2>
+          <h2 className="text-xl font-semibold mb-4">我的视频</h2>
           <p className="text-gray-600">使用 Avatar 生成个性化视频内容</p>
         </a>
       </div>

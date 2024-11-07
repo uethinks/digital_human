@@ -2,8 +2,7 @@
 
 import { useState, useRef } from 'react';
 import { useRouter } from 'next/navigation';
-import { api } from '@/lib/request';
-import { UPLOAD_TALKING_PHOTO } from '@/app/api/avatars/route';
+import { avatarApi } from '@/services/api';
 
 interface AvatarForm {
     file: File | null;
@@ -52,12 +51,8 @@ export default function CreateAvatar() {
         setForm(prev => ({ ...prev, isUploading: true, error: '' }));
 
         try {
-            // 创建 FormData
-            // const formData = new FormData();
-            // formData.append('file', form.file);
-
-            // 上传图片到 HeyGen
-            const response = await UPLOAD_TALKING_PHOTO(form.file);
+            // 使用 avatarApi 上传图片
+            const response = await avatarApi.uploadTalkingPhoto(form.file);
             console.log('upload talking photo response', response);
 
             if (!response.data) {

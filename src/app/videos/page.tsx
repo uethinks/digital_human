@@ -95,10 +95,34 @@ export default function VideoList() {
     }
 
     return (
-        <div className="min-h-screen bg-gray-50">
+        <div className="min-h-screen bg-[var(--background)]">
             <div className="container mx-auto px-4 py-12">
-                <div className="flex justify-between items-center mb-8">
-                    <h1 className="text-3xl font-bold text-gray-900">我的视频</h1>
+                <div className="flex items-center justify-between mb-8">
+                    <div className="flex items-center">
+                        <button
+                            onClick={() => router.push('/avatars')}
+                            className="flex items-center text-gray-600 hover:text-gray-900 mr-6 group"
+                        >
+                            <svg
+                                className="w-5 h-5 mr-2 transform group-hover:-translate-x-1 transition-transform"
+                                fill="none"
+                                stroke="currentColor"
+                                viewBox="0 0 24 24"
+                            >
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+                            </svg>
+                            返回
+                        </button>
+                        <h1 className="text-3xl font-bold text-gray-900">我的视频</h1>
+                    </div>
+                    <button
+                        onClick={() => router.push('/avatars')}
+                        className="bg-blue-500 hover:bg-blue-600 text-white px-6 py-2 rounded-full 
+                        transition-all duration-200 ease-in-out transform hover:scale-105 
+                        shadow-md hover:shadow-lg"
+                    >
+                        生成新视频
+                    </button>
                 </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
@@ -107,7 +131,8 @@ export default function VideoList() {
                         return (
                             <div
                                 key={video.video_id}
-                                className="bg-white rounded-xl shadow-sm hover:shadow-md transition-shadow duration-200 overflow-hidden"
+                                onClick={() => router.push(`/videos/${video.video_id}`)}
+                                className="group bg-white rounded-xl shadow-sm hover:shadow-md transition-all duration-200 overflow-hidden cursor-pointer transform hover:scale-[1.02]"
                             >
                                 {/* 缩略图区域 */}
                                 <div className="relative aspect-video overflow-hidden bg-gray-100">
@@ -115,7 +140,7 @@ export default function VideoList() {
                                         <img
                                             src={video.gif_url}
                                             alt={video.video_title}
-                                            className="w-full h-full object-cover"
+                                            className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
                                         />
                                     ) : (
                                         <div className="flex items-center justify-center h-full">
@@ -139,16 +164,16 @@ export default function VideoList() {
                                 {/* 内容区域 */}
                                 <div className="p-6">
                                     <div className="flex justify-between items-start mb-4">
-                                        <h2 className="w-[70%] text-xl font-semibold text-gray-800 break-words whitespace-pre-wrap min-h-[3rem]">
+                                        <h2 className="flex-1 text-xl font-semibold text-gray-800 break-words whitespace-pre-wrap min-h-[3rem] mr-4">
                                             {video.video_title || '未命名视频'}
                                         </h2>
-                                        <span className={`px-3 py-1 rounded-full text-sm ${status.bgColor} ${status.color}`}>
+                                        <span className={`inline-flex px-3 py-1 rounded-full text-sm whitespace-nowrap ${status.bgColor} ${status.color}`}>
                                             {status.text}
                                         </span>
                                     </div>
 
-                                    <div className="text-sm text-gray-500 mb-4">
-                                        <div className="mb-2">
+                                    <div className="text-sm text-gray-500 space-y-2">
+                                        <div>
                                             <span className="block mb-1">ID:</span>
                                             <span className="font-mono text-xs break-all">{video.video_id}</span>
                                         </div>
@@ -157,29 +182,25 @@ export default function VideoList() {
                                         )}
                                     </div>
 
-                                    <button
-                                        onClick={() => router.push(`/videos/${video.video_id}`)}
-                                        className="w-full bg-gradient-to-r from-blue-500 to-blue-600 
-                                        hover:from-blue-600 hover:to-blue-700 text-white font-medium
-                                        py-2 px-4 rounded-lg transition-all duration-200 
-                                        transform hover:scale-[1.02] hover:shadow-lg
-                                        flex items-center justify-center space-x-2"
-                                    >
-                                        <span>查看详情</span>
-                                        <svg
-                                            className="w-4 h-4"
-                                            fill="none"
-                                            stroke="currentColor"
-                                            viewBox="0 0 24 24"
-                                        >
-                                            <path
-                                                strokeLinecap="round"
-                                                strokeLinejoin="round"
-                                                strokeWidth={2}
-                                                d="M9 5l7 7-7 7"
-                                            />
-                                        </svg>
-                                    </button>
+                                    {/* 移除按钮样式，使用链接样式 */}
+                                    <div className="mt-4 text-right">
+                                        <span className="text-blue-500 hover:text-blue-600 text-sm font-medium inline-flex items-center group">
+                                            查看详情
+                                            <svg
+                                                className="w-4 h-4 ml-1 transform transition-transform duration-200 group-hover:translate-x-1"
+                                                fill="none"
+                                                stroke="currentColor"
+                                                viewBox="0 0 24 24"
+                                            >
+                                                <path
+                                                    strokeLinecap="round"
+                                                    strokeLinejoin="round"
+                                                    strokeWidth={2}
+                                                    d="M9 5l7 7-7 7"
+                                                />
+                                            </svg>
+                                        </span>
+                                    </div>
                                 </div>
                             </div>
                         );

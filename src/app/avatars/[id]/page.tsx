@@ -3,13 +3,12 @@
 import { useState, useRef, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAvatar } from '@/contexts/AvatarContext';
-import { api } from '@/lib/request';
-import { TalkingPhoto, upload } from '@/app/api/avatars/route';
-import { POST } from '@/app/api/videos/route';
+import { assetApi, videoApi, TalkingPhoto } from '@/services/api';
 
 interface AudioUploadForm {
     file: File | null;
     isUploading: boolean;
+    isAudioUploading: boolean;
     error: string;
     title: string;
 }
@@ -17,30 +16,29 @@ interface AudioUploadForm {
 export default function AvatarDetail({ params }: { params: { id: string } }) {
     const router = useRouter();
     const { getTalkingPhotoById } = useAvatar();
-    const [audioAssetId, setAudioAssetId] = useState()
+    const [audioAssetId, setAudioAssetId] = useState<string>();
     const [avatar, setAvatar] = useState<TalkingPhoto | undefined>(undefined);
 
     useEffect(() => {
-        // Unwrapping `params` as a promise
         async function fetchParams() {
-            const { id } = await params; // or await params.id if you need only one param
+            const { id } = await params;
             if (id) {
                 setAvatar(getTalkingPhotoById(id));
             }
         }
 
         fetchParams();
-    }, []);
+    }, [params, getTalkingPhotoById]);
 
     const [form, setForm] = useState<AudioUploadForm>({
         file: null,
         isUploading: false,
+        isAudioUploading: false,
         error: '',
         title: '测试视频'
     });
     const fileInputRef = useRef<HTMLInputElement>(null);
 
-    // 如果没有找到对应的 avatar，显示错误状态
     if (!avatar) {
         return (
             <div className="flex justify-center items-center min-h-screen">
@@ -62,10 +60,19 @@ export default function AvatarDetail({ params }: { params: { id: string } }) {
                 setForm(prev => ({ ...prev, error: '文件大小不能超过 15MB' }));
                 return;
             }
-            setForm(prev => ({ ...prev, file, error: '' }));
-            const res = await upload(file);
-            console.log('asset id: ', res.data.id);
-            setAudioAssetId(res.data.id)
+            setForm(prev => ({ ...prev, file, error: '', isAudioUploading: true }));
+
+            try {
+                const response = await assetApi.upload(file, 'audio');
+                setAudioAssetId(response.data.id);
+                setForm(prev => ({ ...prev, isAudioUploading: false }));
+            } catch (error) {
+                setForm(prev => ({
+                    ...prev,
+                    error: '音频上传失败，请重试',
+                    isAudioUploading: false
+                }));
+            }
         }
     };
 
@@ -78,11 +85,7 @@ export default function AvatarDetail({ params }: { params: { id: string } }) {
         setForm(prev => ({ ...prev, isUploading: true, error: '' }));
 
         try {
-            const formData = new FormData();
-            formData.append('audio', form.file);
-            // formData.append('talking_photo_id', params.id);
-
-            const res = await POST({
+            const response = await videoApi.generate({
                 title: form.title,
                 video_inputs: [
                     {
@@ -103,15 +106,15 @@ export default function AvatarDetail({ params }: { params: { id: string } }) {
                 },
                 "aspect_ratio": null,
                 "test": true
-            })
-            console.log('generate res', res.data);
-            router.push(`/videos/${res.data.video_id}`); // 上传成功后跳转到视频列表页
+            });
+
+            router.push(`/videos/${response.data.video_id}`);
         } catch (error) {
-            setAudioAssetId(undefined)
+            setAudioAssetId(undefined);
             setForm(prev => ({
                 ...prev,
                 isUploading: false,
-                error: '上传失败，请重试'
+                error: '视频生成失败，请重试'
             }));
         }
     };
@@ -167,7 +170,7 @@ export default function AvatarDetail({ params }: { params: { id: string } }) {
                             </h2>
                             <input
                                 type="text"
-                                className="border border-gray-300 rounded-lg p-2 w-full"
+                                className="border text-black border-gray-300 rounded-lg p-2 w-full"
                                 defaultValue="测试视频"
                                 onChange={(e) => setForm(prev => ({ ...prev, title: e.target.value }))}
                             />
@@ -223,9 +226,9 @@ export default function AvatarDetail({ params }: { params: { id: string } }) {
                         {/* 提交按钮 */}
                         <button
                             onClick={handleSubmit}
-                            disabled={form.isUploading || !form.file}
+                            disabled={form.isUploading || !form.file || form.isAudioUploading || !audioAssetId}
                             className={`w-full py-4 px-6 rounded-xl font-semibold text-center
-                ${form.isUploading || !form.file
+                ${form.isUploading || !form.file || form.isAudioUploading || !audioAssetId
                                     ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
                                     : 'bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white transform hover:scale-[1.02] transition-all duration-200'
                                 }
@@ -235,6 +238,11 @@ export default function AvatarDetail({ params }: { params: { id: string } }) {
                                 <div className="flex items-center justify-center">
                                     <div className="animate-spin rounded-full h-5 w-5 border-2 border-white border-t-transparent mr-3"></div>
                                     生成中...
+                                </div>
+                            ) : form.isAudioUploading ? (
+                                <div className="flex items-center justify-center">
+                                    <div className="animate-spin rounded-full h-5 w-5 border-2 border-gray-400 border-t-transparent mr-3"></div>
+                                    音频上传中...
                                 </div>
                             ) : (
                                 '生成视频'
