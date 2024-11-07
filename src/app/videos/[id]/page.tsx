@@ -2,7 +2,6 @@
 
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { api } from '@/lib/request';
 import { GET, STATUS } from '@/app/api/videos/route';
 
 interface VideoStatus {

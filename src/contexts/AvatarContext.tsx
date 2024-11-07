@@ -2,7 +2,7 @@
 
 import { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 import type { Avatar, TalkingPhoto } from '@/app/api/avatars/route';
-import { GET } from '@/app/api/avatars/route';
+import { GET, LIST_TALKING_PHOTOS } from '@/app/api/avatars/route';
 
 interface AvatarContextType {
   avatars: Avatar[];
@@ -27,6 +27,8 @@ export function AvatarProvider({ children }: { children: ReactNode }) {
     try {
       setLoading(true);
       const response = await GET();
+    //   const res = await LIST_TALKING_PHOTOS();
+    //   console.log('talking photos', res);
       if (!response.data) {
         throw new Error("No data received");
       }

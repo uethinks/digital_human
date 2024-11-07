@@ -20,6 +20,25 @@ export async function GET(id: string) {
     }
 }
 
+export async function POST(body: any) {
+    try {
+        // 调用 Heygen API 创建 avatar
+        const response = await api.post('/v2/video/generate', body);
+
+        return {
+            code: 200,
+            message: 'success',
+            data: response.data
+        };
+    } catch (error) {
+        return {
+            code: 500,
+            message: '创建 Avatar 失败',
+            data: null
+        };
+    }
+}
+
 // list
 export async function LIST() {
     try {

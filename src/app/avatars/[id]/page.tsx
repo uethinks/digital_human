@@ -4,7 +4,8 @@ import { useState, useRef, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAvatar } from '@/contexts/AvatarContext';
 import { api } from '@/lib/request';
-import { POST, TalkingPhoto, upload } from '@/app/api/avatars/route';
+import { TalkingPhoto, upload } from '@/app/api/avatars/route';
+import { POST } from '@/app/api/videos/route';
 
 interface AudioUploadForm {
     file: File | null;
@@ -79,7 +80,7 @@ export default function AvatarDetail({ params }: { params: { id: string } }) {
         try {
             const formData = new FormData();
             formData.append('audio', form.file);
-            formData.append('talking_photo_id', params.id);
+            // formData.append('talking_photo_id', params.id);
 
             const res = await POST({
                 title: form.title,

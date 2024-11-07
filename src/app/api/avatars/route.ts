@@ -41,6 +41,49 @@ export async function GET() {
     }
 }
 
+// list talking photos
+export async function LIST_TALKING_PHOTOS() {
+    try {
+        const response = await api.get('/v1/talking_photo.list');
+        return response;
+    } catch (error) {
+        return {
+            code: 500,
+            message: '获取 Talking Photos 列表失败',
+            data: null
+        };
+    }
+}
+
+// upload talking photo
+export async function UPLOAD_TALKING_PHOTO(file: File) {
+    try {
+        const response = await api.post('/v1/talking_photo', file, { baseURL: 'https://upload.heygen.com', headers: { 'Content-Type': 'image/jpeg' }});
+        return response;
+    } catch (error: any) {
+        console.log('upload talking photo error', error?.response?.data?.message);
+        return {
+            code: 500,
+            message: error?.response?.data?.message || '上传 Talking Photo 失败',
+            data: null
+        };
+    }
+}
+
+// delete a talking photo
+export async function DELETE_TALKING_PHOTO(id: string) {
+    try {
+        const response = await api.delete(`/v2/talking_photo/${id}`);
+        return response;
+    } catch (error) {
+        return {
+            code: 500,
+            message: '删除 Talking Photo 失败',
+            data: null
+        };
+    }
+}
+
 export async function POST(body: any) {
     try {
         // 调用 Heygen API 创建 avatar
