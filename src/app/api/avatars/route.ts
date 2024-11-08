@@ -1,12 +1,13 @@
 import { NextResponse } from 'next/server';
-import { api } from '@/lib/request';
+import { heygenApi } from '@/lib/request';
 
 // 获取 Avatar 列表
 export async function GET(request: Request) {
     try {
-        const response = await api.get('/v2/avatars');
+        const response = await heygenApi.get('/v2/avatars');
         return NextResponse.json(response);
     } catch (error) {
+        console.error('Get avatars error:', error);
         return NextResponse.json(
             {
                 code: 500,
@@ -36,7 +37,7 @@ export async function POST(request: Request) {
         }
 
         // 上传到 HeyGen
-        const response = await api.post('/v1/talking_photo', file, {
+        const response = await heygenApi.post('/v1/talking_photo', file, {
             baseURL: 'https://upload.heygen.com',
             headers: {
                 'Content-Type': file.type,
@@ -73,7 +74,7 @@ export async function DELETE(request: Request) {
             );
         }
 
-        const response = await api.delete(`/v2/talking_photo/${id}`);
+        const response = await heygenApi.delete(`/v2/talking_photo/${id}`);
         return NextResponse.json(response);
     } catch (error) {
         return NextResponse.json(

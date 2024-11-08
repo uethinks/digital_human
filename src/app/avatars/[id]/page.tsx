@@ -1,9 +1,12 @@
 'use client';
 
-import { useState, useRef, useEffect } from 'react';
+import { useState, useRef, useEffect, use } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAvatar } from '@/contexts/AvatarContext';
 import { assetApi, videoApi, TalkingPhoto } from '@/services/api';
+
+type Params = Promise<{ id: string }>
+
 
 interface AudioUploadForm {
     file: File | null;
@@ -13,22 +16,18 @@ interface AudioUploadForm {
     title: string;
 }
 
-export default function AvatarDetail({ params }: { params: { id: string } }) {
+export default function AvatarDetail(props: { params: Params }) {
     const router = useRouter();
     const { getTalkingPhotoById } = useAvatar();
     const [audioAssetId, setAudioAssetId] = useState<string>();
     const [avatar, setAvatar] = useState<TalkingPhoto | undefined>(undefined);
 
     useEffect(() => {
-        async function fetchParams() {
-            const { id } = await params;
-            if (id) {
-                setAvatar(getTalkingPhotoById(id));
-            }
+        const { id } = use(props.params);
+        if (id) {
+            setAvatar(getTalkingPhotoById(id));
         }
-
-        fetchParams();
-    }, [params, getTalkingPhotoById]);
+    }, [props.params, getTalkingPhotoById]);
 
     const [form, setForm] = useState<AudioUploadForm>({
         file: null,

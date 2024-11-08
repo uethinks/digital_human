@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { LIST } from '@/app/api/videos/route';
+import { videoApi } from '@/services/api';
 
 interface Video {
     video_id: string;
@@ -23,7 +23,7 @@ export default function VideoList() {
     useEffect(() => {
         const fetchVideos = async () => {
             try {
-                const response = await LIST();
+                const response = await videoApi.list();
                 setVideos(response.data.videos || []);
             } catch (err) {
                 setError('获取视频列表失败');

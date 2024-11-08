@@ -1,75 +1,71 @@
 import { NextResponse } from 'next/server';
-import { api } from '@/lib/request';
+import { heygenApi } from '@/lib/request';
 
-
-export async function GET(id: string) {
+// 获取视频列表
+export async function GET(request: Request) {
     try {
-        // 调用 Heygen API 获取 avatars 列表
-        const response = await api.get(`/v1/personalized_video/audience/detail?id=${id}`);
-        // console.log('response', response);
-        // 返回完整的响应数据，包含 avatars 和 talking_photos
-        return response;
+        // 如果有 id 参数，获取单个视频详情
+        // 否则获取视频列表
+        const response = await heygenApi.get('/v1/video.list');
+        console.log('videos get response: ', response)
+        return NextResponse.json(response);
     } catch (error) {
-        return (
+        return NextResponse.json(
             {
                 code: 500,
-                message: '获取 Video 详情',
+                message: '获取视频信息失败',
                 data: null
-            }
+            },
+            { status: 500 }
         );
     }
 }
 
-export async function POST(body: any) {
+// 生成视频
+export async function POST(request: Request) {
     try {
-        // 调用 Heygen API 创建 avatar
-        const response = await api.post('/v2/video/generate', body);
-
-        return {
-            code: 200,
-            message: 'success',
-            data: response.data
-        };
+        const body = await request.json();
+        const response = await heygenApi.post('/v2/video/generate', body);
+        return NextResponse.json(response);
     } catch (error) {
-        return {
-            code: 500,
-            message: '创建 Avatar 失败',
-            data: null
-        };
-    }
-}
-
-// list
-export async function LIST() {
-    try {
-        const response = await api.get('/v1/video.list');
-        return response;
-    } catch (error) {
-        return (
+        return NextResponse.json(
             {
                 code: 500,
-                message: '获取 Video 列表',
+                message: '生成视频失败',
                 data: null
-            }
+            },
+            { status: 500 }
         );
     }
 }
 
-// get video status
-export async function STATUS(id: string) {
+// 获取视频状态
+export async function HEAD(request: Request) {
     try {
-        // 调用 Heygen API 获取 avatars 列表
-        const response = await api.get(`/v1/video_status.get?video_id=${id}`);
-        // console.log('response', response);
-        // 返回完整的响应数据，包含 avatars 和 talking_photos
-        return response;
+        const { searchParams } = new URL(request.url);
+        const videoId = searchParams.get('video_id');
+
+        if (!videoId) {
+            return NextResponse.json(
+                {
+                    code: 400,
+                    message: '缺少视频ID',
+                    data: null
+                },
+                { status: 400 }
+            );
+        }
+
+        const response = await heygenApi.get(`/v1/video_status.get?video_id=${videoId}`);
+        return NextResponse.json(response);
     } catch (error) {
-        return (
+        return NextResponse.json(
             {
                 code: 500,
-                message: '获取 Video 状态',
+                message: '获取视频状态失败',
                 data: null
-            }
+            },
+            { status: 500 }
         );
     }
 }

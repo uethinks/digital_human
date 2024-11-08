@@ -1,9 +1,10 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { use, useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { GET, STATUS } from '@/app/api/videos/route';
+import { videoApi } from '@/services/api';
 
+type Params = Promise<{ id: string }>
 interface VideoStatus {
     id: string;
     status: 'pending' | 'processing' | 'completed' | 'failed' | 'waiting';
@@ -14,7 +15,7 @@ interface VideoStatus {
     duration?: number;
 }
 
-export default function VideoDetail({ params }: { params: { id: string } }) {
+export default function VideoDetail(props: { params: Params }) {
     const router = useRouter();
     const [video, setVideo] = useState<VideoStatus | null>(null);
     const [loading, setLoading] = useState(true);
@@ -23,36 +24,30 @@ export default function VideoDetail({ params }: { params: { id: string } }) {
 
     // 定期检查视频状态
     useEffect(() => {
-        async function fetchParams() {
-            const { id } = await params; // or await params.id if you need only one param
-            if (id) {
-                const checkStatus = async () => {
-                    try {
-                        // const res_video = await GET(id);
-                        const res_status = await STATUS(id);
-                        // console.log('video detail: ', res_video.data)
-                        console.log('video status: ', res_status.data)
-                        setVideo(res_status.data);
-                        setLoading(false);
-                        if (res_status.data.error ) {
-                            throw new Error(res_status.data?.error?.detail ||'创建失败')
-                        }
+        const { id } = use(props.params);
+        if (id) {
+            const CheckStatus = async () => {
+                try {
+                    const response = await videoApi.getStatus(id);
+                    setVideo(response.data);
+                    setLoading(false);
 
-                        // 如果视频还在处理中，继续检查
-                        if (res_status.data.status === 'pending' || res_status.data.status === 'processing' || res_status.data.status === 'waiting') {
-                            setTimeout(checkStatus, 60000); // 每一分钟检查一次
-                        }
-                    } catch (err: any) {
-                        setError(err.message || '获取视频状态失败');
-                        setLoading(false);
+                    if (response.data.error) {
+                        throw new Error(response.data?.error?.detail || '创建失败');
                     }
-                };
-                checkStatus();
-            }
-        }
 
-        fetchParams();
-    }, []);
+                    // 如果视频还在处理中，继续检查
+                    if (['pending', 'processing', 'waiting'].includes(response.data.status)) {
+                        setTimeout(CheckStatus, 60000); // 每一分钟检查一次
+                    }
+                } catch (err: any) {
+                    setError(err.message || '获取视频状态失败');
+                    setLoading(false);
+                }
+            };
+            CheckStatus();
+        }
+    }, [props.params]);
 
     const getStatusDisplay = () => {
         if (!video) return null;

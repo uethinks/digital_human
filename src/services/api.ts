@@ -4,7 +4,7 @@ import { api } from '@/lib/request';
 export const avatarApi = {
     // 获取 Avatar 列表
     list: async () => {
-        const response = await api.get('/v2/avatars');
+        const response = await api.get('/avatars');
         return response;
     },
 
@@ -13,18 +13,13 @@ export const avatarApi = {
         const formData = new FormData();
         formData.append('file', file);
         
-        const response = await api.post('/v1/talking_photo', formData, {
-            baseURL: 'https://upload.heygen.com',
-            headers: {
-                'Content-Type': file.type,
-            }
-        });
+        const response = await api.post('/avatars', formData);
         return response;
     },
 
     // 删除 Avatar
     delete: async (id: string) => {
-        const response = await api.delete(`/v2/talking_photo/${id}`);
+        const response = await api.delete(`/avatars?id=${id}`);
         return response;
     }
 };
@@ -33,25 +28,25 @@ export const avatarApi = {
 export const videoApi = {
     // 获取视频列表
     list: async () => {
-        const response = await api.get('/v1/video.list');
+        const response = await api.get('/videos');
         return response;
     },
 
     // 获取视频详情
     getDetail: async (id: string) => {
-        const response = await api.get(`/v1/personalized_video/audience/detail?id=${id}`);
+        const response = await api.get(`/videos?id=${id}`);
         return response;
     },
 
     // 获取视频状态
-    getStatus: async (id: string) => {
-        const response = await api.get(`/v1/video_status.get?video_id=${id}`);
+    getStatus: async (videoId: string) => {
+        const response = await api.get(`/videos/${videoId}`);
         return response;
     },
 
     // 生成视频
     generate: async (data: any) => {
-        const response = await api.post('/v2/video/generate', data);
+        const response = await api.post('/videos', data);
         return response;
     }
 };
@@ -59,21 +54,20 @@ export const videoApi = {
 // 资源上传接口
 export const assetApi = {
     upload: async (file: File, type: 'audio' | 'image') => {
-        console.log('upload file type', type);
         const formData = new FormData();
-        formData.append('file', file);
+        const buffer = Buffer.from(await file.arrayBuffer());
+        formData.append('file', new Blob([buffer]), file.name);
+        formData.append('type', type);
         
-        const contentType = type === 'audio' ? 'audio/x-wav' : file.type;
-        
-        const response = await api.post('/v1/asset', file, {
-            baseURL: 'https://upload.heygen.com',
+        const response = await api.post('/assets', formData, {
             headers: {
-                'Content-Type': contentType,
+                'Content-Type': 'multipart/form-data'
             }
         });
         return response;
     }
 };
+
 export interface Avatar {
     avatar_id: string;
     avatar_name: string;
