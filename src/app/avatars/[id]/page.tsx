@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useRef, useEffect, use } from 'react';
-import { useRouter } from 'next/navigation';
+import { useParams, useRouter } from 'next/navigation';
 import { useAvatar } from '@/contexts/AvatarContext';
 import { assetApi, videoApi, TalkingPhoto } from '@/services/api';
 
@@ -21,13 +21,14 @@ export default function AvatarDetail(props: { params: Params }) {
     const { getTalkingPhotoById } = useAvatar();
     const [audioAssetId, setAudioAssetId] = useState<string>();
     const [avatar, setAvatar] = useState<TalkingPhoto | undefined>(undefined);
+    const  { id }  = useParams();
+    console.log('props: ', props, id);
 
     useEffect(() => {
-        const { id } = use(props.params);
         if (id) {
-            setAvatar(getTalkingPhotoById(id));
+            setAvatar(getTalkingPhotoById(id as string));
         }
-    }, [props.params, getTalkingPhotoById]);
+    }, [id, getTalkingPhotoById]);
 
     const [form, setForm] = useState<AudioUploadForm>({
         file: null,
